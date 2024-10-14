@@ -2,7 +2,7 @@
 
 ---
 
-![Logo](https://raw.githubusercontent.com/sarahekim53/sarahekim53.github.io/master/images/net.png)
+![Logo](./img/logo.svg)
 
 ---
 
@@ -11,44 +11,102 @@
 
 ---
 
-## Date: February, 2024
+## Date: December, 2022
 
 ---
-
-## Content
-1. Data Cleaning
-2. Visualization and Analysis
-
--2.1 Movies and shows by released years
-2.2 Countries with the most movies/shows
-2.3 Casts with the most movies/shows
-2.4 Movie Ratings
-2.5 Movie Ratings in IMDb
-2.6 Duration of Movies
-2.7 Oldest/Newest Shows
-2.8 Word Cloud
-
-3. Machine Learning: Recommendation System
-4. Conclusion
 
 ---
 
 # Project Objective
-Netflix's goal in creating a machine learning-based recommendation system is to maximize user engagement by delivering personalized content. The objective is to present each user with movies, TV shows, or documentaries they are most likely to enjoy, based on their preferences and past behaviors. This system is crucial for maintaining and growing Netflix's subscriber base by keeping users engaged for longer periods and reducing churn.
+The 2014 Mental Health in Tech Survey aimed to understand the prevalence of mental health issues within the tech industry and assess how companies in this sector are addressing these concerns. The survey was designed to raise awareness, identify gaps in support systems, and encourage better mental health practices within an industry known for high stress and burnout.
 
-# Description of the method
+# Key Problematic Areas:
 
-Objectives of Netflix’s Recommendation System:
-Maximizing User Satisfaction: Deliver personalized content that users are highly likely to enjoy to increase engagement and reduce churn.
+- Stigma Around Mental Health:
 
-Improving Content Discovery: Help users discover new shows or movies they may not have searched for but would enjoy, encouraging deeper exploration of Netflix's catalog.
+    - Perception of Mental Health: In 2014, mental health issues in the workplace, particularly in tech, were often seen as a sign of weakness. This stigma could prevent employees from seeking help or disclosing mental health conditions due to fear of being judged or discriminated against.
+    - Impact on Career: Employees were concerned that acknowledging mental health struggles could negatively impact their career progression, lead to fewer opportunities, or even result in job loss.
 
-Enhancing Retention: By continuously delivering relevant content, Netflix aims to reduce churn by making the platform indispensable to its users.
+- Lack of Awareness and Education:
 
-Optimizing for Long-Term Value: Rather than just focusing on short-term engagement, Netflix’s system aims to build long-term user loyalty by catering to evolving tastes and habits.
+    - Limited Mental Health Policies: Many companies, especially tech startups and small to medium-sized businesses, lacked formal mental health policies. Employees often did not know what resources were available or how to access mental health support.
+    - Untrained Management: Many managers and HR departments were not equipped with the necessary training to recognize or support employees facing mental health challenges. This lack of awareness could exacerbate stress and workplace dissatisfaction.
 
-Methods Employed in the Recommendation System:
-Netflix uses a combination of collaborative filtering, content-based filtering, and hybrid approaches to generate its recommendations.
+- Workplace Culture:
+
+    - High-Pressure Environment: The tech industry is known for its long hours, tight deadlines, and high expectations, often contributing to stress, anxiety, and burnout. The survey aimed to measure the impact of this environment on mental health.
+    - Remote Work and Isolation: Many tech employees work remotely or have flexible hours, which, while convenient, can lead to isolation and a lack of social support from colleagues.
+
+- Access to Mental Health Resources:
+
+    - Unequal Access: While some large tech companies provided mental health benefits such as therapy or counseling, smaller companies and startups often didn’t have the resources to offer comprehensive mental health support.
+    - Cost and Insurance Barriers: Even when mental health resources were available, employees could face significant barriers, such as high costs or lack of coverage in health insurance plans.
+
+# Table of Contents
+1. Data Introduction
+2. Data Cleaning
+   2.1 Null Values
+      - 2.1.1 Comments
+      - 2.1.2 States
+      - 2.1.3 Work Interfere
+      - 2.1.4 Self Employed
+   2.2 Data Consistency
+      - 2.2.1 Gender
+      - 2.2.2 Age
+3. Data Analysis & Visualizations
+   - 3.1 Age
+   - 3.2 Gender
+   - 3.3 Country
+   - 3.4 Work Interference with Mental Health based on Gender
+   - 3.5 Work Interference with Mental Health based on the Company Type (Tech/Non-Tech)
+   - 3.6 Remote Work Environment and Work Interference
+   - 3.7 Mental Health Benefits
+   - 3.8 Mental Health vs. Physical Health
+     - 3.8.1 Do you think that discussing a health issue with your employer would have negative consequences?
+     - 3.8.2 Have you heard of or observed negative consequences with mental health conditions in your workplace?
+   - 3.9 Mental/Physical Health Issues in Interviews
+     - 3.9.1 Would you bring up a mental/physical health issue with a potential employer in an interview?
+   - 3.10 Willingness to Discuss a Mental Health Issue
+   - 3.11 Word Cloud on Comments
+4. Machine Learning
+   - Cleaning
+   - Encoding
+   - Scaling & Fitting
+   - Logistic Regression
+   - K-Neighbors Classifier
+   - Decision Tree Classifier
+   - Random Forest
+   - Accuracy Scores
+5. Conclusion
+
+```python
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+from collections import Counter
+import matplotlib.pyplot as plt
+import re
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import metrics
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import cross_val_score
+
+# Display all columns
+pd.set_option('display.max_columns', None)
+
+# Load the dataset
+survey = pd.read_csv('survey.csv')
+
 
 ## 1. Data Cleaning
 
@@ -64,113 +122,218 @@ from collections import Counter
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
 ```
+## Data Descriptions
+
+| Column Name            | Description                                                                       |
+|------------------------|-----------------------------------------------------------------------------------|
+| family_history          | Do you have a family history of mental illness?                                   |
+| treatment               | Have you sought treatment for a mental health condition?                          |
+| work_interfere          | If you have a mental health condition, do you feel that it interferes with work?  |
+| no_employees            | How many employees does your company or organization have?                        |
+| remote_work             | Do you work remotely (outside of an office) at least 50% of the time?             |
+| tech_company            | Is your employer primarily a tech company/organization?                           |
+| benefits                | Does your employer provide mental health benefits?                                |
+| care_options            | Do you know the mental health care options provided by your employer?             |
+| wellness_program        | Has your employer ever discussed mental health as part of a wellness program?     |
+| seek_help               | Does your employer provide resources to learn about mental health and seek help?  |
+| anonymity               | Is your anonymity protected if you use mental health or substance abuse resources?|
+| leave                   | How easy is it to take medical leave for a mental health condition?               |
+| mentalhealthconsequence | Do you think discussing a mental health issue with your employer would have consequences? |
+| physhealthconsequence   | Do you think discussing a physical health issue with your employer would have consequences? |
+| coworkers               | Would you discuss a mental health issue with your coworkers?                      |
+| supervisor              | Would you discuss a mental health issue with your supervisor(s)?                  |
+| mentalhealthinterview   | Would you bring up a mental health issue with a potential employer in an interview?|
+| physhealthinterview     | Would you bring up a physical health issue with a potential employer in an interview?|
+| mentalvsphysical        | Do you feel your employer takes mental health as seriously as physical health?    |
+| obs_consequence         | Have you observed negative consequences for coworkers with mental health issues?  |
+| comments                | Any additional notes or comments                                                  |
 
 
-```python
-netflix = pd.read_csv('netflix.csv')
-
-```
-
-```python
-netflix.head(2)
-
-```
 <img src="img/0.png" width="600" height="400">
 
-```python
-netflix.shape
-
-```
 
 
 ```python
-netflix.describe()
-
+survey.shape
 ```
 
+```bash
+
+(1259, 27)
+```
+
+```python
+survey.columns
+
+```
 <img src="img/1.png" width="600" height="400">
 
 
 ```python
-netflix.columns
-
-```
-<img src="img/2.png" width="600" height="400">
-
-
-```python
-netflix.dtypes
-
+survey.describe()
 ```
 
 <img src="img/3.png" width="600" height="400">
 
-**Let's delete columns such as showid, description as we have index and do not need descriptions.**
 
 
 ```python
-netflix.drop(columns=['show_id'], inplace=True)
-
+survey.isna().sum()
 ```
 <img src="img/4.png" width="600" height="400">
 
-**Then change data type for date added for the future use.**
 
 
 ```python
-netflix['date_added'] = pd.to_datetime(netflix['date_added'])
-movies = netflix.loc[netflix['type'] == 'Movie']
-shows = netflix.loc[netflix['type'] == 'TV Show']
+percent_missing = survey.isnull().sum() * 100 / len(survey)
+null_percentage = pd.DataFrame({'Column Name': survey.columns,
+                                 'Missing Percentage': percent_missing})
 
-movies.drop(columns=['type'], inplace=True)
-shows.drop(columns=['type'], inplace=True)
+null_percentage.sort_values('Missing Percentage', ascending=False, inplace=True)
+null_percentage
 
-movies.reset_index(drop=True, inplace=True)
-shows.reset_index(drop=True, inplace=True)
-
-movies['duration'] = movies['duration'].str.replace('min', '')
-movies['duration'] = movies['duration'].astype(int)
-
-movies.head(2)
 ```
+
+| Column Name               | Missing Percentage  |
+|---------------------------|--------------------:|
+| comments                  | 86.973789           |
+| state                     | 40.905481           |
+| work_interfere            | 20.969023           |
+| self_employed             | 1.429706            |
+| seek_help                 | 0.000000            |
+| obs_consequence           | 0.000000            |
+| mental_vs_physical        | 0.000000            |
+| phys_health_interview     | 0.000000            |
+| mental_health_interview   | 0.000000            |
+| supervisor                | 0.000000            |
+| coworkers                 | 0.000000            |
+| phys_health_consequence   | 0.000000            |
+| mental_health_consequence | 0.000000            |
+| leave                     | 0.000000            |
+| anonymity                 | 0.000000            |
+| Timestamp                 | 0.000000            |
+| wellness_program          | 0.000000            |
+| Age                       | 0.000000            |
+| benefits                  | 0.000000            |
+| tech_company              | 0.000000            |
+| remote_work               | 0.000000            |
+| no_employees              | 0.000000            |
+| treatment                 | 0.000000            |
+| family_history            | 0.000000            |
+| Country                   | 0.000000            |
+| Gender                    | 0.000000            |
+| care_options              | 0.000000            |
+
+
+## 2. Data Cleaning
+
+a. Null Values
+
+```python
+survey.loc[survey['comments'].isna() == False].head()
+```
+
 
 <img src="img/5.png" width="600" height="400">
 
+**Although 87% of the 'comments' column is missing and I thought about dropping the column, I think I can use the comments for world cloud to find the most common words. So we will just leave it as it is for now.**
+
+### State
 
 ```python
-shows.head(2)
+survey.loc[survey['state'].isna() == True].shape
 
+```
+
+```bash
+(515, 27)
+```
+
+```python
+survey.loc[(survey['state'].isna() == True) & (survey['Country'] != 'United States')].shape
+
+```
+
+```bash
+(504, 27)
+
+```
+
+**It looks like except the 11 rows with NULL, the rest of the 504 rows with NULL in the state column belong to non-US countries such as UK and Australia. But we can query data only for United States, and find some information on different states, so we will also keep this as it is.**
+
+### Work Interfere
+
+```python
+survey['work_interfere'].value_counts()
+```
+
+```bash
+Sometimes    465
+Never        213
+Rarely       173
+Often        144
+Name: work_interfere, dtype: int64
+
+```
+
+```python
+survey.loc[survey['work_interfere'].isna() == True].head()
 ```
 
 <img src="img/6.png" width="600" height="400">
 
-## 2. Visualization
 
-1. Movies and Shows by Release Year and Added Date
+**We will fill the NULL values with the mode value of the 'work interfere' column.**
 
-a. Movies and shows by release year
 
 ```python
-movies_release_year = movies.groupby('release_year').count()['title'].to_frame()\
-                .reset_index().rename(columns={'release_year':'Release Year', 'title':'Count'})
-shows_release_year = shows.groupby('release_year').count()['title'].to_frame()\
-                .reset_index().rename(columns={'release_year':'Release Year', 'title':'Count'})
+survey['work_interfere'].fillna(survey['work_interfere'].mode()[0], inplace=True)
 
-fig = go.Figure()
+survey['work_interfere'].isna().sum()
 
-fig.add_trace(go.Scatter(x=movies_release_year['Release Year'], y=movies_release_year['Count'],
-                    mode='lines',
-                    name='Movies'))
-fig.add_trace(go.Scatter(x=shows_release_year['Release Year'], y=shows_release_year['Count'],
-                    mode='lines',
-                    name='Shows'))
+```
 
-fig.update_layout(template='none', title='Movies and Shows by Release Year',
-                 width=950, height=500)
-fig.update_yaxes(showgrid=False)
-fig.update_xaxes(showgrid=False)
+```bash
+0
+```
 
-fig.show()
+
+### Self Employed¶
+
+
+```python
+survey.loc[survey['self_employed'] == 'Yes']['no_employees'].value_counts()
+
+```
+
+```bash
+1-5               98
+6-25              31
+26-100             8
+100-500            5
+More than 1000     4
+Name: no_employees, dtype: int64
+```
+
+
+```python
+survey.loc[survey['self_employed'] == 'No']['no_employees'].value_counts()
+
+```
+
+```bash
+More than 1000    277
+26-100            276
+6-25              253
+100-500           168
+1-5                62
+500-1000           59
+Name: no_employees, dtype: int64
+```
+
+
+```python
+survey.loc[survey['self_employed'].isna() == True].head()
 
 ```
 
@@ -178,122 +341,230 @@ fig.show()
 
 
 
-**Netflix carries most of the shows and movies released in 2000 to 2020. There is much less movies earlier than 1980.**
+**Based on the above information, when there is 1-6 employees for the company, the respondees are mostly self-employeed. Although this is not completely accurate, we will temporarily fill the NULL value according to that for now.**
 
-b. Movies and shows by added date
+
+```python
+survey['self_employed'].value_counts()
+```
+
+```bash
+No     1095
+Yes     146
+Name: self_employed, dtype: int64
+```
 
 
 ```python
 
 
-movies['date_added'] = pd.to_datetime(movies['date_added'], errors='coerce').dt.strftime('%Y-%m')
-shows['date_added'] = pd.to_datetime(shows['date_added'], errors='coerce').dt.strftime('%Y-%m')
+values = survey['no_employees'].eq('1-5').map({False: 'No', True: 'Yes'})
+survey['self_employed'] = survey['self_employed'].fillna(values)
 
-movies_date_added = movies.groupby('date_added').count()['title']\
-            .to_frame().reset_index().rename(columns = {'date_added':'Date Added', 'title':'Count'})
-shows_date_added = shows.groupby('date_added').count()['title']\
-            .to_frame().reset_index().rename(columns = {'date_added':'Date Added', 'title':'Count'})
+survey['self_employed'].isna().sum()
 
-fig = go.Figure()
 
-fig.add_trace(go.Scatter(x=movies_date_added['Date Added'], y=movies_date_added['Count'],
-                    mode='lines',
-                    name='Movies'))
-fig.add_trace(go.Scatter(x=shows_date_added['Date Added'], y=shows_date_added['Count'],
-                    mode='lines',
-                    name='Shows'))
+```
 
-fig.update_layout(template='none', title='Movies and Shows by Added Date',
-                 width=950, height=500)
-fig.update_yaxes(showgrid=False)
-fig.update_xaxes(showgrid=False)
+```bash
+0
+```
 
+2. Data Consistency
+### Gender
+
+There is a lot going on here. We will first fix all typos such as 'M', 'F', 'f' to correct Male and Female category first.
+
+```python
+survey['Gender'].value_counts().to_frame().sample(2)
+
+
+```
+
+```bash
+
+	            Gender
+Neuter 	        1
+Genderqueer 	1
+```
+
+
+
+```python
+
+
+LGBT = survey['Gender'].str.contains('Trans|Neuter|queer|andro|Andro|Enby|binary|trans')
+survey.loc[LGBT, 'Gender'] = 'LGBT'
+
+
+
+Others = survey['Gender'].str.contains('N|A|p')
+survey.loc[Others, 'Gender'] = 'Others'
+
+Female = survey['Gender'].str.contains('F|Wo|f|wo')
+survey.loc[Female, 'Gender'] = 'Female'
+
+
+
+Male = ~survey['Gender'].isin(['Female', 'Others', 'LGBT'])
+survey.loc[Male, 'Gender'] = 'Male'
+
+survey['Gender'].value_counts()
+
+```
+
+```bash
+Male      994
+Female    248
+LGBT       12
+Others      5
+Name: Gender, dtype: int64
+```
+
+### Age
+
+```python
+min(survey['Age'])
+
+```
+
+```bash
+-1726
+
+```
+
+```python
+max(survey['Age'])
+```
+
+```bash
+99999999999
+
+```
+```python
+survey['Age'].mean()
+```
+
+```bash
+79428148.31135821
+
+```
+
+```python
+survey.loc[survey['Age'] > 80, 'Age'] = np.nan
+survey.loc[survey['Age'] < 18, 'Age'] = np.nan
+
+survey['Age'].mean()
+
+```
+
+```bash
+32.07673860911271
+
+```
+
+```python
+survey['Age'] = survey['Age'].fillna(value=survey['Age'].mean())
+
+```
+
+## 3. Data Analysis & Visualizations
+1. Age
+
+
+```python
+fig = px.histogram(survey, x="Age")
+fig.update_layout(template='none')
 fig.show()
-
 ```
 
 <img src="img/8.png" width="600" height="400">
 
-**Netflix added a lot of shows and movies from 2016. According to Netflix, it started streaming from 2007.**
 
-2. Countries with the Most Movies and Shows
+
+2. Gender
 
 
 ```python
+gender_df = survey.groupby('Gender').count()['Timestamp'].to_frame()\
+            .reset_index().rename(columns={'Timestamp':'Count'}).sort_values(by='Count', ascending=False)
 
+colors = ['mediumturquoise', 'darkorange', 'lightgreen', 'gold']
 
-netflix_country = netflix['country'].str.split(', ').explode()\
-                .value_counts()[:15].to_frame().reset_index().rename(columns={'index':'Country', 'country':'Count'})
-
-fig = px.scatter_geo(netflix_country, locations="Country", color="Count",
-                     locationmode='country names', size_max=50,
-                     hover_name="Country", size="Count",
-                     projection="natural earth", color_continuous_scale=px.colors.diverging.BrBG,
-                     title='Top 15 Countries with the Most Movies and Shows on Netflix')
+fig = go.Figure(data=[go.Pie(labels=gender_df['Gender'],
+                             values=gender_df['Count'])])
+fig.update_traces(hoverinfo='percent', textinfo='label', textfont_size=20,
+                  marker=dict(colors=colors, line=dict(color='#000000', width=2)))
+fig.update_layout(title='Gender')
 fig.show()
-
 
 ```
 
 <img src="img/9.png" width="600" height="400">
 
-a. Countries with the most movies
+
+3. Country¶
+
 
 ```python
-movies_country = movies['country'].str.split(', ').explode().value_counts()[:15]\
-            .to_frame().reset_index().rename(columns={'index':'Country', 'country':'Number of Movies'})
+country_df = survey.groupby('Country').count()['Timestamp'].to_frame().reset_index().rename(columns={'Timestamp':'Count'})
 
-fig = px.scatter_geo(movies_country, locations="Country", color="Number of Movies",
-                     locationmode='country names', size_max=50,
-                     hover_name="Country", size="Number of Movies",
-                     projection="natural earth", color_continuous_scale=px.colors.diverging.BrBG,
-                     title='Top 15 Countries with the Most Movies on Netflix')
+codes = pd.read_csv('codes.csv')
+codes.drop(columns='GDP (BILLIONS)', inplace=True)
+code_dict = codes.set_index('COUNTRY')['CODE'].to_dict()
 
 
+
+country_df['Code'] = country_df['Country'].map(code_dict)
+
+
+fig = px.choropleth(country_df, locations="Code",
+                    color="Count", 
+                    hover_name="Country",
+                    color_continuous_scale=px.colors.sequential.OrRd)
+fig.update_layout(title='Countries')
 fig.show()
 
 ```
 
 <img src="img/10.png" width="600" height="400">
 
-b. Countries with the most shows
+
+
+4. Work Interference with Mental Health based on Gender¶
+
 
 ```python
 
 
-shows_country = shows['country'].str.split(', ').explode().value_counts()[:15]\
-            .to_frame().reset_index().rename(columns={'index':'Country', 'country':'Number of Shows'})
+work_gender = survey.groupby(['work_interfere', 'Gender']).count()['Timestamp']\
+            .to_frame().reset_index().rename(columns={'work_interfere':'Work Interference', 'Timestamp':'Count'})
 
-fig = px.scatter_geo(shows_country, locations="Country", color="Number of Shows",
-                     locationmode='country names', size_max=50,
-                     hover_name="Country", size="Number of Shows",
-                     projection="natural earth", color_continuous_scale=px.colors.diverging.BrBG,
-                     title='Top 15 Countries with the Most Shows on Netflix')
+
+
+
+fig = px.sunburst(work_gender, path=['Work Interference', 'Gender'], values='Count',
+                 color='Work Interference', color_discrete_sequence=px.colors.qualitative.G10)
+fig.update_layout(height=700, title='Work Interference Level')
 fig.show()
 
 ```
 
 <img src="img/11.png" width="600" height="400">
 
-**United States has the most shows and movies on Netflix, but also, Indian has the second most movies and shows, which I did not expect.**
-
-3. Casts with the Most Movies and Shows on Netflix
-
-a. Casts with the most movies
 
 ```python
 
 
-movies_casts = movies['cast'].str.split(', ').explode().value_counts()[:10]\
-            .to_frame().reset_index().rename(columns={'index':'Cast', 'cast':'Number of Movies'})
+work_gender_percent = work_gender.groupby(['Gender','Work Interference'])\
+                    .agg({'Count':'sum'}).groupby(level=0).apply(lambda x: round(100 * x / float(x.sum()), 2))\
+                    .reset_index()
+work_gender_percent = work_gender_percent.rename(columns={'Count':'Percentage'})
 
-fig = px.bar(movies_casts, x="Number of Movies", y="Cast", color='Cast', orientation='h',
-            template='none', width=900, height=400, color_discrete_sequence=px.colors.qualitative.Vivid,
-            title='Top 15 Countries with the Most Movies on Netflix')
-fig.update_layout(yaxis={'categoryorder':'total ascending'},
-                  margin=dict(l=130, r=10, t=100))
-fig.update_xaxes(showgrid=False)
-fig.update_yaxes(showticklabels=True, title_text=None)
+
+fig = px.sunburst(work_gender_percent, path=['Gender', 'Work Interference'], values='Percentage',
+                 color='Percentage', color_continuous_scale='PuRd')
+fig.update_layout(height=700, title='Work Interference Level based on Gender')
 fig.show()
 
 ```
@@ -301,121 +572,200 @@ fig.show()
 <img src="img/12.png" width="600" height="400">
 
 
-b. Casts with the most shows¶
+
+5. Work Interference with Mental Health based on the Company Type (Tech/Non-Tech)¶
 
 
 ```python
 
 
-shows_casts = shows['cast'].str.split(', ').explode().value_counts()[:10]\
-            .to_frame().reset_index().rename(columns={'index':'Cast', 'cast':'Number of Shows'})
+tech_work = survey.groupby(['tech_company', 'work_interfere']).count()['Timestamp']\
+            .to_frame().reset_index().rename(columns={'tech_company': 'Tech Company?', 
+                                                      'work_interfere': 'Work Interference', 
+                                                      'Timestamp': 'Count'})
 
-fig = px.bar(shows_casts, x="Number of Shows", y="Cast", color='Cast', orientation='h',
-            template='none', width=900, height=400, color_discrete_sequence=px.colors.qualitative.Vivid,
-            title='Top 15 Countries with the Most Shows on Netflix')
-fig.update_layout(yaxis={'categoryorder':'total ascending'},
-                 margin=dict(l=130, r=10, t=100))
-fig.update_xaxes(showgrid=False)
-fig.update_yaxes(showticklabels=True, title_text=None)
+
+tech_work = tech_work.groupby(['Tech Company?','Work Interference'])\
+                    .agg({'Count':'sum'}).groupby(level=0).apply(lambda x: round(100 * x / float(x.sum()), 2))\
+                    .reset_index()
+tech_work = tech_work.rename(columns={'Count':'Percentage'})
+
+
+fig = px.bar(tech_work, x="Percentage", y="Tech Company?", color='Work Interference', orientation='h',
+             height=400, title='Is company directly related to Tech?', text='Percentage',
+             color_discrete_sequence=px.colors.qualitative.G10)
+fig.update_layout(template='none', hovermode='closest')
+fig.update_traces(texttemplate='%{text}%')
 fig.show()
-
 ```
 
 <img src="img/13.png" width="600" height="400">
 
-**Although United States has the most shows and movies on Netflix, the cast with the most movies is Indian. Unlike U.S., it seems like there is less diversities in Indian movie industry. Additionally, the cast with the most shows is Japanese.**
 
-4. Moving Ratings
+
+
+6. Remote Work Environment and Work Interference¶
+
 
 ```python
-movie_ratings = movies.groupby('rating').count()['title'].sort_values(ascending=False)\
-                .to_frame().reset_index().rename(columns = {'rating':'Rating', 'title':'Count'})
+remote_work = survey.groupby(['remote_work', 'work_interfere']).count()['Timestamp']\
+            .to_frame().reset_index().rename(columns={'remote_work': 'Work From Home?', 
+                                                      'work_interfere': 'Work Interference', 
+                                                      'Timestamp': 'Count'})
 
-fig = px.pie(movie_ratings, values='Count', names='Rating', title='Netflix Movie Ratings',
-            color_discrete_sequence=px.colors.sequential.RdBu)
+
+
+remote_work = remote_work.groupby(['Work From Home?','Work Interference'])\
+                    .agg({'Count':'sum'}).groupby(level=0).apply(lambda x: round(100 * x / float(x.sum()), 2))\
+                    .reset_index()
+remote_work = remote_work.rename(columns={'Count':'Percentage'})
+
+
+
+fig = px.bar(remote_work, x="Percentage", y="Work From Home?", color='Work Interference', orientation='h',
+             height=400, title='Remote Work Environment', text='Percentage',
+             color_discrete_sequence=px.colors.qualitative.G10)
+fig.update_layout(template='none', hovermode='closest')
+fig.update_traces(texttemplate='%{text}%')
 fig.show()
+
 ```
 
 <img src="img/14.png" width="600" height="400">
 
-**TV-MA and TV-14 is the most common ratings on Netflix.**
 
-5. Best Rated Movies in Netflix using IMDb Ratings
+
+7. Mental Health Benefits¶
+
 
 ```python
-
-
-ratings = pd.read_csv('IMDb ratings.csv', usecols=['weighted_average_vote'])
-movie_ratings = pd.read_csv('IMDb movies.csv', usecols=['title', 'year', 'genre'])
-imdb = pd.DataFrame({'title':movie_ratings.title, 'release_year':movie_ratings.year,
-                    'rating':ratings.weighted_average_vote, 'listed_in':movie_ratings.genre})
-imdb.drop_duplicates(subset=['title','release_year','rating'], inplace=True)
-
-
-
-movies_rated = movies.merge(imdb, on='title', how='inner')
-movies_rated.drop(columns=['release_year_y', 'listed_in_y'], inplace=True)
+benefits = survey.groupby('benefits').count()['Timestamp'].to_frame().\
+            reset_index().rename(columns={'benefits': 'Benefits', 'Timestamp': 'Count'})
+care_options = survey.groupby('care_options').count()['Timestamp'].to_frame().\
+            reset_index().rename(columns={'care_options': 'Care Options', 'Timestamp': 'Count'})
+wellness_program = survey.groupby('wellness_program').count()['Timestamp'].to_frame().\
+            reset_index().rename(columns={'wellness_program': 'Wellness Program', 'Timestamp': 'Count'})
+help_resource = survey.groupby('seek_help').count()['Timestamp'].to_frame().\
+            reset_index().rename(columns={'seek_help': 'Help Resource', 'Timestamp': 'Count'})
 
 
 
-movies_rated = movies_rated.rename(columns={'title': 'Title', 'director': 'Director', 'cast': 'Cast',
-                             'date_added': 'Date Added', 'release_year_x': 'Release Year', 'country': 'Country',
-                             'rating_x': 'TV Rating', 'duration': 'Duration',
-                             'listed_in_x': 'Genre', 'rating_y':'Rating'})
-top_10 = movies_rated.sort_values(by='Rating', ascending=False)[:10]
+colors = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen']
+specs = [[{'type':'domain'}, {'type':'domain'}], [{'type':'domain'}, {'type':'domain'}]]
+fig = make_subplots(rows=2, cols=2, specs=specs)
 
-fig = px.sunburst(top_10, path=['Title','Country'], values='Rating', color='Rating',
-                  color_continuous_scale='YlGn', title='Highst Rated Movies on Netflix in Each Countries',
-                  hover_data=['Title', 'Country', 'Rating'])
+fig.add_trace(go.Pie(labels=benefits['Benefits'], 
+                     values=benefits['Count'], 
+                     name="Benefits"), 1, 1)
+fig.add_trace(go.Pie(labels=care_options['Care Options'], 
+                     values=care_options['Count'], 
+                     name="Care Options"), 1, 2)
+fig.add_trace(go.Pie(labels=wellness_program['Wellness Program'], 
+                     values=wellness_program['Count'], 
+                     name="Wellness Program"), 2, 1)
+fig.add_trace(go.Pie(labels=help_resource['Help Resource'], 
+                     values=help_resource['Count'], 
+                     name="Help Resource"), 2, 2)
 
-fig.update_traces(hovertemplate='Title: %{customdata[0]} <br>Country: %{customdata[1]} <br>Rating: %{customdata[2]}')
-fig.update_layout(legend_title_text='Rating')
+fig.update_traces(hole=.5, hoverinfo="label+percent+name",
+                  marker=dict(line=dict(color='#000000', width=2)))
+fig.update_layout(title_text="Mental Health Benefits", height=800, width=950,
+                  annotations=[dict(text='Benefits', x=0.168, y=0.815, font_size=20, showarrow=False),
+                               dict(text='Care<br>Options', x=0.828, y=0.822, font_size=20, showarrow=False),
+                               dict(text='Wellness<br>Program', x=0.168, y=0.18, font_size=20, showarrow=False),
+                               dict(text='Help<br>Resource', x=0.833, y=0.18, font_size=20, showarrow=False)])
 fig.show()
 
 ```
 
 <img src="img/15.png" width="600" height="400">
 
-6. Duration of Movies
+
+
+
+8. Mental Health vs. Pysical Health
+Do you think that discussing a mental/phsical health issue with your employer would have negative consequences?
 
 
 ```python
-fig = px.histogram(movies, x='duration', nbins=22, template='none', 
-                   title='Netflix Movie Duration')
-fig.update_yaxes(showgrid=False)
+mental = survey['mental_health_consequence'].value_counts().to_frame().reset_index()\
+        .rename(columns={'index': 'Mental', 'mental_health_consequence': 'Count'})
+physical = survey['phys_health_consequence'].value_counts().to_frame().reset_index()\
+        .rename(columns={'index': 'Physical', 'phys_health_consequence': 'Count'})
 
+
+
+fig = go.Figure()
+fig.add_trace(go.Bar(y=mental['Mental'], x=mental['Count'], 
+                     name='Mental', orientation='h',
+                     marker=dict(color='rgba(246, 78, 139, 0.6)',
+                                 line=dict(color='rgba(246, 78, 139, 1.0)', width=3))))
+fig.add_trace(go.Bar(y=physical['Physical'], x=physical['Count'],
+                     name='Physical', orientation='h',
+                     marker=dict(color='rgba(58, 71, 80, 0.6)', 
+                                 line=dict(color='rgba(58, 71, 80, 1.0)', width=3))))
+
+fig.update_layout(barmode='stack', template='none', hovermode='closest',
+                 title='Mental or Physical Health results in Negative Consequences?')
+fig.update_xaxes(showgrid=False)
 fig.show()
+
 ```
 
 <img src="img/16.png" width="600" height="400">
 
-**The most common durations for movies is from 80 to 90 minutes, but also it is common if the movies is a bit longer than that.**
 
-7. Oldest/Newest Shows
+**Have you heard of or observed negative consequences for coworkers with mental health conditions in your workplace?**
+
 
 ```python
-us_shows = shows.loc[shows['country'] == 'United States']
-us_shows_old = us_shows.sort_values(by='release_year')[:15]
-us_shows_new = us_shows.sort_values(by='release_year', ascending=False)[:15]
+observations = survey['obs_consequence'].value_counts().to_frame().reset_index()\
+                .rename(columns={'index':'Observations', 'obs_consequence': 'Count'})
 
-fig = go.Figure(data=[go.Table(header=dict(values=['Title', 'Release Year'], 
-                                           fill_color='paleturquoise'), 
-                               cells=dict(values=[us_shows_old['title'], us_shows_old['release_year']], 
-                                          fill_color='lavender'))])
-fig.update_layout(title='Oldest American Shows on Netflix')
+
+fig = go.Figure()
+fig.add_trace(go.Bar(y=mental['Mental'], x=mental['Count'], 
+                     name='Assumptions', orientation='h',
+                     marker=dict(color='rgba(161, 191, 133, 0.6)',
+                                 line=dict(color='rgba(161, 191, 133, 1.0)', width=3))))
+fig.add_trace(go.Bar(y=observations['Observations'], x=observations['Count'],
+                     name='Consequences', orientation='h',
+                     marker=dict(color='rgba(35, 34, 45, 0.6)', 
+                                 line=dict(color='rgba(35, 34, 45, 1.0)', width=3))))
+
+fig.update_layout(barmode='stack', template='none', hovermode='closest',
+                 title='Mental Health Condition results in Negative Consequences?')
+fig.update_xaxes(showgrid=False)
 fig.show()
 
 ```
 
 <img src="img/17.png" width="600" height="400">
 
+9. Mental/Physical Health Issues in Interviews
+
+Would you bring up a mental/physical health issue with a potential employer in an interview?
 
 ```python
-fig = go.Figure(data=[go.Table(header=dict(values=['Title', 'Release Year'], 
-                                           fill_color='paleturquoise'), 
-                               cells=dict(values=[us_shows_new['title'], us_shows_new['release_year']], 
-                                          fill_color='lavenderblush'))])
-fig.update_layout(title='Newest American Shows on Netflix')
+mental_int = survey['mental_health_interview'].value_counts().to_frame().reset_index()\
+        .rename(columns={'index': 'Mental', 'mental_health_interview': 'Count'})
+physical_int = survey['phys_health_interview'].value_counts().to_frame().reset_index()\
+        .rename(columns={'index': 'Physical', 'phys_health_interview': 'Count'})
+
+
+fig = go.Figure()
+fig.add_trace(go.Bar(y=mental_int['Mental'], x=mental_int['Count'], 
+                     name='Mental', orientation='h',
+                     marker=dict(color='rgba(246, 78, 139, 0.6)',
+                                 line=dict(color='rgba(246, 78, 139, 1.0)', width=3))))
+fig.add_trace(go.Bar(y=physical_int['Physical'], x=physical_int['Count'],
+                     name='Physical', orientation='h',
+                     marker=dict(color='rgba(58, 71, 80, 0.6)', 
+                                 line=dict(color='rgba(58, 71, 80, 1.0)', width=3))))
+
+fig.update_layout(barmode='stack', template='none', hovermode='closest',
+                 title='Mental or Physical Health discussion in Interview Process?')
+fig.update_xaxes(showgrid=False)
 fig.show()
 
 ```
@@ -423,50 +773,80 @@ fig.show()
 <img src="img/18.png" width="600" height="400">
 
 
-8. Word Cloud
+
+10. Willingness to Discuss a Mental Health Issue
+
+Would you be willing to discuss a mental health issue with your coworkers?
 
 ```python
-
-
-genres = list(movies['listed_in'])
-genre = []
-
-for i in genres:
-    i = list(i.split(','))
-    for j in i:
-        genre.append(j.replace(' ', ''))
-gen = Counter(genre)
-
-
-text = list(set(genre))
-plt.rcParams['figure.figsize'] = (15, 10)
-wordcloud = WordCloud(max_font_size=50, max_words=50,background_color="white").generate(str(text))
-
-plt.imshow(wordcloud, interpolation="bilinear")
-plt.axis("off")
-plt.show()
+fig = go.Figure()
+fig.add_trace(go.Histogram(x=survey['coworkers'], name='Co-workers'))
+fig.add_trace(go.Histogram(x=survey['supervisor'], name='Supervisors'))
+fig.update_traces(opacity=0.75)
+fig.update_layout(template='none', hovermode='closest', 
+                  title='Willingness to Discuss a Mental Health Issue')
+fig.show()
 
 ```
 <img src="img/19.png" width="600" height="400">
 
 
 
-**The most popular genre on Netflix are independent movie, thriller, standup comedy and classic movies. Also Children movies are quite popular, too.**
 
-3. Machine Learning
-
-- Recommendation System
-
-I decided to learn about it. (by: Niharika Pandit https://www.kaggle.com/niharika41298/netflix-visualizations-recommendation-eda)
-
+11. Word Colud on Comments
 
 ```python
-from sklearn.feature_extraction.text import TfidfVectorizer
+comments = list(survey['comments'].dropna())
 
-tfidf = TfidfVectorizer(stop_words='english')
-netflix['description'] = netflix['description'].fillna('')
-tfidf_matrix = tfidf.fit_transform(netflix['description'])
-tfidf_matrix.shape
+
+
+
+comment = []
+for i in comments:
+    i = list(i.split(' '))
+    for j in i:
+        comment.append(j.replace(' ', ''))
+        
+com = Counter(comment)
+lower_com =  {k.lower(): v for k, v in com.items()}
+
+
+
+
+conjunction = ['Although', 'As if', 'Because', 'Even', 'Even though', 'If then', 'In order that', 'Now when', 'Rather than']
+conjunction = [i.lower() for i in conjunction]
+other_words = ['i\'m', 'not', 'on', 'the', 'my', 'be', 'when', 'which', 'could', 'would', 'a', 'an', 'to', 'too',
+              'so', 'many', 'of', 'don\'t', 'have', 'that', 'also', 'did', 'get', 'may', 'lot' 'i\'ve', 'i',
+              'this', 'however', 'based', 'doesn\'t', 'it\'', 'than', 'including', 'non', 'however\'', 'than\'',
+              'inclulding\'', 'my\'', 'them', 'does', 'though', 'they', 'we', 'know']
+all_words = conjunction + other_words
+
+
+formatted_comments = []
+for key, value in lower_com.items():
+    if (len(key) > 3) & (key not in all_words):
+        formatted_comments.append(key)
+
+
+
+
+
+formatted_comments_apo = []
+for comment in formatted_comments:
+    formatted_comments_apo.append(re.sub(r"'[^.\s]*", "", comment))
+
+
+
+
+plt.rcParams['figure.figsize'] = (15, 10)
+wordcloud = WordCloud(max_font_size=50, 
+                      max_words=60,
+                      stopwords=all_words,
+                      background_color="white").generate(str(formatted_comments_apo))
+
+plt.imshow(wordcloud, interpolation="bilinear")
+plt.axis("off")
+plt.show()
 
 ```
 
@@ -474,35 +854,309 @@ tfidf_matrix.shape
 
 
 
-**There is over 16,000 words describe about 6,000 movies.**
+## 4. Machine Learning
+
+```python
+train_df = pd.read_csv('survey.csv')
+
+
+train_df = train_df.drop(['comments'], axis= 1)
+train_df = train_df.drop(['state'], axis= 1)
+train_df = train_df.drop(['Timestamp'], axis= 1)
+
+```
+
+
+Cleaning all NaN values¶
+
+```python
+train_df.columns
+```
+
+```bash
+Index(['Age', 'Gender', 'Country', 'self_employed', 'family_history',
+       'treatment', 'work_interfere', 'no_employees', 'remote_work',
+       'tech_company', 'benefits', 'care_options', 'wellness_program',
+       'seek_help', 'anonymity', 'leave', 'mental_health_consequence',
+       'phys_health_consequence', 'coworkers', 'supervisor',
+       'mental_health_interview', 'phys_health_interview',
+       'mental_vs_physical', 'obs_consequence'],
+      dtype='object')
+```
+
+```python
+int_features = []
+float_features = [] 
+string_features = []
+
+for column in train_df.columns:
+    if isinstance(train_df[column][0], np.integer):
+        int_features.append(column)
+    elif isinstance(train_df[column][0], np.float):
+        float_features.append(column)
+    else:
+        string_features.append(column)    
+
+
+
+
+null_int = 0
+null_string = 'NaN'
+null_float = 0
+
+for feature in train_df:
+    if feature in int_features:
+        train_df[feature] = train_df[feature].fillna(null_int)
+    elif feature in string_features:
+        train_df[feature] = train_df[feature].fillna(null_string)
+    elif feature in float_features:
+        train_df[feature] = train_df[feature].fillna(null_float)
+
+
+
+
+train_df['Gender'] = survey['Gender']
+genders = ['Female', 'Male']
+trans = ~train_df['Gender'].isin(genders)
+train_df.loc[trans, 'Gender'] = 'trans'
+train_df['Gender'] = train_df['Gender'].str.lower()
+
+
+train_df['Age'].fillna(train_df['Age'].median(), inplace = True)
+ages = pd.Series(train_df['Age'])
+ages[ages<18] = train_df['Age'].median()
+
+train_df['Age'] = ages
+ages = pd.Series(train_df['Age'])
+ages[ages>120] = train_df['Age'].median()
+train_df['Age'] = ages
+
+train_df['age_range'] = pd.cut(train_df['Age'], [0,20,30,65,100], 
+                               labels=["0-20", "21-30", "31-65", "66-100"], 
+                               include_lowest=True)
+
+
+
+
+
+train_df['self_employed'] = train_df['self_employed'].replace(np.nan, 'No')
+train_df['self_employed'] = train_df['self_employed'].replace(0, 'No')
+
+
+
+train_df['self_employed'].value_counts()
+
+```
+
+```bash
+No     1113
+Yes     146
+Name: self_employed, dtype: int64
+
+```
+
+```python
+train_df['work_interfere'] = train_df['work_interfere'].replace(np.nan, 'Don\'t know')
+train_df['work_interfere'] = train_df['work_interfere'].replace('NaN', 'Don\'t know')
+```
+
+
+Encoding Data¶
 
 
 ```python
+label_dict = {}
+for feature in train_df:
+    
+    encoder = preprocessing.LabelEncoder()
+    encoder.fit(train_df[feature])
+    name_mapping = dict(zip(encoder.classes_, encoder.transform(encoder.classes_)))
+    train_df[feature] = encoder.transform(train_df[feature])
+    
+    label_key = 'label_' + feature
+    label_value = [*name_mapping]
+    
+    label_dict[label_key] = label_value
 
 
-from sklearn.metrics.pairwise import linear_kernel
-cosine_similarity = linear_kernel(tfidf_matrix, tfidf_matrix)
-indices = pd.Series(netflix.index, index=netflix['title']).drop_duplicates()
+train_df = train_df.drop(['Country'], axis= 1)
 
+corr = train_df.corr()
 
+fig = go.Figure(data=go.Heatmap(z=corr, x=corr.index, y=corr.columns, 
+                                hoverongaps=False))
+fig.update_layout(title='Correlations Between Columns', width=800, height=800)
+fig.show()
 
-def get_recommendations(title, cosine_sim=cosine_similarity):
-    idx = indices[title]
-    sim_scores = list(enumerate(cosine_sim[idx]))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    sim_scores = sim_scores[1:11]
-
-    movie_indices = [i[0] for i in sim_scores]
-
-    return netflix['title'].iloc[movie_indices]
-
-get_recommendations('Jane The Virgin')
 
 ```
 
 <img src="img/21.png" width="600" height="400">
 
 
-## 4. Conclusion
+Scailing and Fitting¶
 
-As a person who watches Netflix regularly, this analysis was something that I expected, but also was surprised. For example, I did not know there were so many of Indian movies and shows, as I only watch shows and movies in english. Additionally, although Netflix started streaming from 2007, there were not many movies added at the time. Rather, a lot of movies were added later from 2015. This has been a fun analysis, and I'm looking towards watching more Netflix shows and movies!
+```python
+scaler = MinMaxScaler()
+train_df['Age'] = scaler.fit_transform(train_df[['Age']])
+
+```
+
+```bash
+Age 	Gender 	self_employed 	family_history 	treatment 	work_interfere 	no_employees 	remote_work 	tech_company 	benefits 	care_options 	wellness_program 	seek_help 	anonymity 	leave 	mental_health_consequence 	phys_health_consequence 	coworkers 	supervisor 	mental_health_interview 	phys_health_interview 	mental_vs_physical 	obs_consequence 	age_range
+0 	0.431818 	0 	0 	0 	1 	2 	4 	0 	1 	2 	1 	1 	2 	2 	2 	1 	1 	1 	2 	1 	0 	2 	0 	2
+1 	0.590909 	1 	0 	0 	0 	3 	5 	0 	0 	0 	0 	0 	0 	0 	0 	0 	1 	0 	0 	1 	1 	0 	0 	2
+2 	0.318182 	1 	0 	0 	0 	3 	4 	0 	1 	1 	0 	1 	1 	0 	1 	1 	1 	2 	2 	2 	2 	1 	0 	2
+3 	0.295455 	1 	0 	1 	1 	2 	2 	0 	1 	1 	2 	1 	1 	1 	1 	2 	2 	1 	0 	0 	0 	1 	1 	2
+4 	0.295455 	1 	0 	0 	0 	1 	1 	1 	1 	2 	0 	0 	0 	0 	0 	
+
+```
+
+```python
+features = ['Age', 'Gender', 'family_history', 'benefits', 'care_options', 'anonymity', 'leave', 'work_interfere']
+X = train_df[features]
+y = train_df.treatment
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+
+method_dict = {}
+rmse_dict = ()
+
+```
+
+
+Random Forest¶
+
+```python
+forest = ExtraTreesClassifier(n_estimators=250, random_state=0)
+forest.fit(X, y)
+
+importances = forest.feature_importances_
+std = np.std([tree.feature_importances_ for tree in forest.estimators_], axis=0)
+indices = np.argsort(importances)[::-1]
+
+labels = []
+for i in range(X.shape[1]):
+    labels.append(features[i])      
+
+
+fig = go.Figure()
+fig.add_trace(go.Bar(x=X.columns, y=importances[indices],
+                     error_y=dict(type='data', color='olive', array=std[indices])))
+fig.update_traces(marker_color='darkred', marker_line_color='darkred',
+                  marker_line_width=1.5, opacity=0.6)
+fig.update_layout(barmode='group', template='none', title='Feature Importances')
+fig.show()
+
+```
+
+<img src="img/22.png" width="600" height="400">
+
+
+Logistic Regression
+
+
+```python
+log_reg = LogisticRegression()
+log_reg.fit(X_train, y_train)
+y_pred_class = log_reg.predict(X_test)
+
+log_reg_accruacy_score = metrics.accuracy_score(y_test, y_pred_class)
+log_reg_accruacy_score
+
+```
+
+```bash
+0.7883597883597884
+
+```
+
+
+KNeighbors Classifier¶
+
+
+```python
+knn = KNeighborsClassifier(n_neighbors=27, weights='uniform')
+knn.fit(X_train, y_train)
+y_pred_class = knn.predict(X_test)
+
+knn_accuracy_score = metrics.accuracy_score(y_test, y_pred_class)
+knn_accuracy_score
+
+```
+
+```bash
+0.8068783068783069
+
+```
+
+
+Decision Tree Classifier
+
+
+```python
+
+
+tree = DecisionTreeClassifier(max_depth=3, min_samples_split=8, max_features=6, 
+                              criterion='entropy', min_samples_leaf=7)
+tree.fit(X_train, y_train)
+y_pred_class = tree.predict(X_test)
+
+tree_accuracy_score = metrics.accuracy_score(y_test, y_pred_class)
+tree_accuracy_score
+
+```
+
+```bash
+0.8095238095238095
+
+```
+
+
+Random Forest
+
+
+```python
+rf = RandomForestClassifier(max_depth=None, min_samples_leaf=8, min_samples_split=2, 
+                                n_estimators=20, random_state=1)
+rf.fit(X_train, y_train)
+y_pred_class = rf.predict(X_test)
+
+rf_accuracy_score = metrics.accuracy_score(y_test, y_pred_class)
+rf_accuracy_score
+
+```
+
+```bash
+0.8148148148148148
+```
+
+
+Visualization of Accuracy Scores of All Models¶
+
+
+```python
+scores = {'Name': ['Logistic Regression', 'KNeighbors Classifier', 'Decision Tree Classifier', 'Random Forest'], 
+         'Score': [0.788, 0.807, 0.81, 0.815]}
+scores = pd.DataFrame(data=scores)
+
+fig = px.bar(scores, x='Name', y='Score', color='Score',
+            color_continuous_scale=px.colors.sequential.Purples)
+fig.update_layout(template='none', title='Accuracy Scores')
+fig.update_xaxes(title='')
+fig.show()
+
+```
+
+<img src="img/23.png" width="600" height="400">
+
+
+## 5. Conclusion
+
+Well, I'm very excited to finish this data analysis on mental health survey in the Technology industry. As a person working in this industry for many coming years, I was always curious about people's mental health. Also, I could tell there were more males than female or LGBT individuals in the field. But since this is from 2014, this might not be right anymore. Also, I found it was interesting that people were identifying themselves with cis-gender, non-binary, etc. Because I only recently started learning about different gender types. And another interesting thing about gender was that people who did not belong to any male, female, and LGBT group answered their mental health interfered with work (often, sometimes) more than other genders. But I will need a larger size of data to check this.
+
+Also, either the company was directly related to Technology or not, or remote or not, the people answered similarly. It turned out many employees were not aware of wellness programs or mental health resources offered by a company.
+
+I tried using WordCloud on the comment sections, but I need to find a better way to deal with long sentences. Also, I need to continue to study machine learning, so when I follow tutorials or build models, I can have a better understanding.
+
+In conclusion, this was a very interesting analysis, and I'm hoping to do it again once I get the latest data on this topic!
